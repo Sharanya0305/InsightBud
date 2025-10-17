@@ -1,0 +1,259 @@
+/**
+ * @fileoverview Firestore Security Rules for InsightBud application.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model. Each user has full
+ * control over their own data, and no user can access another user's data.
+ *
+ * Data Structure:
+ * Data is nested under `/users/{userId}`, ensuring data isolation. Each user
+ * has their own collections for expenses, budgets, savings goals, and contributions.
+ *
+ * Key Security Decisions:
+ * - Users can only access their own data. Listing other users' data is disallowed.
+ * - All write operations require the user to be authenticated.
+ * - Data consistency between the path and the document's internal fields is enforced.
+ *
+ * Denormalization for Authorization:
+ * To avoid costly `get()` calls, data required for authorization (e.g., `userId`)
+ * is denormalized directly onto the documents being secured.
+ *
+ * Structural Segregation:
+ * All user-related data is stored under the `/users/{userId}` path.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Protects the root-level `/users` collection and ensures only the authenticated user can read or create their own profile.
+     * @path /databases/{database}/documents/users/{userId}
+     * @allow (get) Authenticated user can read their own profile.
+     * @allow (create) Authenticated user can create their own profile.
+     * @deny (list) Listing all users is not allowed.
+     * @deny (update) Users cannot update other user profiles.
+     * @deny (delete) Users cannot delete other user profiles.
+     * @principle Enforces document ownership and restricts access to a user's own data tree.
+     */
+    match /users/{userId} {
+      // Helper function to check if the user is signed in
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      // Helper function to check if the requesting user is the owner of the resource
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      // Helper function to check if the requesting user is the owner of the existing resource
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if false;
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id; // Immutable id
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Manages user-specific expense records. Only the owner user can create, read, update, and delete their own expenses.
+     * @path /databases/{database}/documents/users/{userId}/expenses/{expenseId}
+     * @allow (get) Authenticated owner user can get their own expenses.
+     * @allow (create) Authenticated owner user can create their own expenses.
+     * @deny (list) Other users cannot list a target user's expenses.
+     * @deny (update) Other users cannot update a target user's expenses.
+     * @deny (delete) Other users cannot delete a target user's expenses.
+     * @principle Enforces document ownership for writes and restricts access to a user's data tree.
+     */
+    match /users/{userId}/expenses/{expenseId} {
+      // Helper function to check if the user is signed in
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      // Helper function to check if the requesting user is the owner of the resource
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      // Helper function to check if the requesting user is the owner of the existing resource
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if isSignedIn() && isOwner(userId);
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId; // Immutable userId
+      allow delete: if isExistingOwner(userId);
+    }
+
+      /**
+       * @description Manages user-specific category records. Only the owner user can create, read, update, and delete their own categories.
+       * @path /databases/{database}/documents/users/{userId}/categories/{categoryId}
+       * @allow (get) Authenticated owner user can get their own category.
+       * @allow (create) Authenticated owner user can create their own category.
+       * @deny (list) Other users cannot list a target user's categories.
+       * @deny (update) Other users cannot update a target user's categories.
+       * @deny (delete) Other users cannot delete a target user's categories.
+       * @principle Enforces document ownership for writes and restricts access to a user's data tree.
+       */
+    match /users/{userId}/categories/{categoryId} {
+      // Helper function to check if the user is signed in
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      // Helper function to check if the requesting user is the owner of the resource
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      // Helper function to check if the requesting user is the owner of the existing resource
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if isSignedIn() && isOwner(userId);
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId; // Immutable userId
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Manages user-specific budget records. Only the owner user can create, read, update, and delete their own budgets.
+     * @path /databases/{database}/documents/users/{userId}/budgets/{budgetId}
+     * @allow (get) Authenticated owner user can get their own budget.
+     * @allow (create) Authenticated owner user can create their own budget.
+     * @deny (list) Other users cannot list a target user's budgets.
+     * @deny (update) Other users cannot update a target user's budgets.
+     * @deny (delete) Other users cannot delete a target user's budgets.
+     * @principle Enforces document ownership for writes and restricts access to a user's data tree.
+     */
+    match /users/{userId}/budgets/{budgetId} {
+      // Helper function to check if the user is signed in
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      // Helper function to check if the requesting user is the owner of the resource
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      // Helper function to check if the requesting user is the owner of the existing resource
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if isSignedIn() && isOwner(userId);
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId; // Immutable userId
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Manages user-specific savings goal records. Only the owner user can create, read, update, and delete their own savings goals.
+     * @path /databases/{database}/documents/users/{userId}/savingsGoals/{goalId}
+     * @allow (get) Authenticated owner user can get their own savings goal.
+     * @allow (create) Authenticated owner user can create their own savings goal.
+     * @deny (list) Other users cannot list a target user's savings goals.
+     * @deny (update) Other users cannot update a target user's savings goals.
+     * @deny (delete) Other users cannot delete a target user's savings goals.
+     * @principle Enforces document ownership for writes and restricts access to a user's data tree.
+     */
+    match /users/{userId}/savingsGoals/{goalId} {
+      // Helper function to check if the user is signed in
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      // Helper function to check if the requesting user is the owner of the resource
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      // Helper function to check if the requesting user is the owner of the existing resource
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if isSignedIn() && isOwner(userId);
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId; // Immutable userId
+      allow delete: if isExistingOwner(userId);
+    }
+
+      /**
+       * @description Manages user-specific contribution records for savings goals. Only the owner user can create, read, update, and delete their own contributions.
+       * @path /databases/{database}/documents/users/{userId}/contributions/{contributionId}
+       * @allow (get) Authenticated owner user can get their own contribution.
+       * @allow (create) Authenticated owner user can create their own contribution.
+       * @deny (list) Other users cannot list a target user's contributions.
+       * @deny (update) Other users cannot update a target user's contributions.
+       * @deny (delete) Other users cannot delete a target user's contributions.
+       * @principle Enforces document ownership for writes and restricts access to a user's data tree.
+       */
+    match /users/{userId}/contributions/{contributionId} {
+      // Helper function to check if the user is signed in
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
+      // Helper function to check if the requesting user is the owner of the resource
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+      // Helper function to check if the requesting user is the owner of the existing resource
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if isSignedIn() && isOwner(userId);
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId; // Immutable userId
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Manages user-specific rollover records. Only the owner user can create, read, update, and delete their own rollovers.
+     * @path /databases/{database}/documents/users/{userId}/rollovers/{rolloverId}
+     * @allow (get) Authenticated owner user can get their own rollover.
+     * @allow (create) Authenticated owner user can create their own rollover.
+     * @deny (list) Other users cannot list a target user's rollovers.
+     * @deny (update) Other users cannot update a target user's rollovers.
+     * @deny (delete) Other users cannot delete a target user's rollovers.
+     * @principle Enforces document ownership for writes and restricts access to a user's data tree.
+     */
+    match /users/{userId}/rollovers/{rolloverId} {
+          // Helper function to check if the user is signed in
+        function isSignedIn() {
+          return request.auth != null;
+        }
+
+        // Helper function to check if the requesting user is the owner of the resource
+        function isOwner(userId) {
+          return request.auth.uid == userId;
+        }
+
+        // Helper function to check if the requesting user is the owner of the existing resource
+        function isExistingOwner(userId) {
+          return isOwner(userId) && resource != null;
+        }
+
+        allow get: if isSignedIn() && isOwner(userId);
+        allow list: if isSignedIn() && isOwner(userId);
+        allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
+        allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId; // Immutable userId
+        allow delete: if isExistingOwner(userId);
+    }
+  }
+}

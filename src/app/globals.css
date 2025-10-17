@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 225 20% 95%;
+    --foreground: 224 71.4% 4.1%;
+    --card: 225 20% 100%;
+    --card-foreground: 224 71.4% 4.1%;
+    --popover: 225 20% 100%;
+    --popover-foreground: 224 71.4% 4.1%;
+    --primary: 170 80% 40%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 220 14.3% 95.9%;
+    --secondary-foreground: 220.9 39.3% 11%;
+    --muted: 220 14.3% 95.9%;
+    --muted-foreground: 220 8.9% 46.1%;
+    --accent: 220 14.3% 95.9%;
+    --accent-foreground: 220.9 39.3% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 170 80% 40%;
+    --chart-1: 170 80% 40%;
+    --chart-2: 330 81% 60%;
+    --chart-3: 40 80% 55%;
+    --chart-4: 280 75% 65%;
+    --chart-5: 210 85% 60%;
+    --sidebar-background: 220 14.3% 95.9%;
+    --sidebar-foreground: 224 71.4% 4.1%;
+    --sidebar-primary: 170 80% 40%;
+    --sidebar-primary-foreground: 210 20% 98%;
+    --sidebar-accent: 225 20% 100%;
+    --sidebar-accent-foreground: 224 71.4% 4.1%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 170 80% 40%;
+  }
+
+  .dark {
+    --background: 225 20% 10%;
+    --foreground: 210 20% 98%;
+    --card: 225 20% 15%;
+    --card-foreground: 210 20% 98%;
+    --popover: 225 20% 10%;
+    --popover-foreground: 210 20% 98%;
+    --primary: 170 80% 45%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 225 20% 25%;
+    --secondary-foreground: 210 20% 98%;
+    --muted: 225, 20%, 25%;
+    --muted-foreground: 217.9 10.6% 64.9%;
+    --accent: 225 20% 25%;
+    --accent-foreground: 210 20% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 20% 98%;
+    --border: 225 20% 25%;
+    --input: 225 20% 25%;
+    --ring: 170 80% 45%;
+    --chart-1: 170 80% 45%;
+    --chart-2: 330 81% 60%;
+    --chart-3: 40 80% 55%;
+    --chart-4: 280 75% 65%;
+    --chart-5: 210 85% 60%;
+    --sidebar-background: 225 20% 10%;
+    --sidebar-foreground: 210 20% 98%;
+    --sidebar-primary: 170 80% 45%;
+    --sidebar-primary-foreground: 210 20% 98%;
+    --sidebar-accent: 225 20% 25%;
+    --sidebar-accent-foreground: 210 20% 98%;
+    --sidebar-border: 225 20% 25%;
+    --sidebar-ring: 170 80% 45%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+    .react-calendar-heatmap .color-empty {
+      fill: hsl(var(--muted) / 0.5);
+    }
+    .react-calendar-heatmap .color-scale-1 {
+      fill: hsl(var(--primary) / 0.2);
+    }
+    .react-calendar-heatmap .color-scale-2 {
+      fill: hsl(var(--primary) / 0.4);
+    }
+    .react-calendar-heatmap .color-scale-3 {
+      fill: hsl(var(--primary) / 0.7);
+    }
+    .react-calendar-heatmap .color-scale-4 {
+      fill: hsl(var(--primary) / 1.0);
+    }
+    .react-calendar-heatmap text {
+        fill: hsl(var(--muted-foreground));
+        font-size: 10px;
+    }
+    .react-calendar-heatmap .react-calendar-heatmap-small-text {
+        font-size: 5px;
+    }
+}

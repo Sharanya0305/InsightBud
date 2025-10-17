@@ -1,0 +1,185 @@
+
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user of the InsightBud application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user.",
+          "format": "email"
+        }
+      },
+      "required": [
+        "id",
+        "email"
+      ]
+    },
+    "Expense": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Expense",
+      "type": "object",
+      "description": "Represents an expense record for a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the expense entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Expense)"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the expense."
+        },
+        "category": {
+          "type": "string",
+          "description": "Category of the expense (e.g., Food, Travel)."
+        },
+        "amount": {
+          "type": "number",
+          "description": "Amount of the expense."
+        },
+        "date": {
+          "type": "string",
+          "description": "Date of the expense.",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional notes for the expense."
+        },
+        "isRecurring": {
+          "type": "boolean",
+          "description": "Whether the expense is a recurring payment."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "title",
+        "category",
+        "amount",
+        "date"
+      ]
+    },
+    "Budget": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Budget",
+      "type": "object",
+      "description": "Represents a budget goal for a user.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the budget entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to User. (Relationship: User 1:N Budget)"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Budget amount for the period."
+        },
+        "period": {
+          "type": "string",
+          "description": "Budget period (e.g., monthly, weekly)."
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "amount",
+        "period"
+      ]
+    },
+    "Contribution": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Contribution",
+      "description": "Represents a single contribution to a savings goal.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the contribution."
+        },
+        "userId": {
+          "type": "string",
+          "description": "The user who made the contribution."
+        },
+        "goalId": {
+          "type": "string",
+          "description": "The savings goal this contribution is for."
+        },
+        "amount": {
+          "type": "number",
+          "description": "The amount contributed."
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date of the contribution."
+        }
+      },
+      "required": ["id", "userId", "goalId", "amount", "date"]
+    },
+    "Rollover": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "title": "Rollover",
+        "description": "Represents a budget surplus rollover transaction.",
+        "type": "object",
+        "properties": {
+            "id": { "type": "string" },
+            "userId": { "type": "string" },
+            "month": { "type": "string" },
+            "transferredAmount": { "type": "number" },
+            "transferredToGoalId": { "type": "string" }
+        },
+        "required": ["id", "userId", "month", "transferredAmount", "transferredToGoalId"]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "/users/{userId}": {
+        "schema": { "$ref": "#/entities/User" },
+        "description": "Stores user profiles."
+    },
+    "/users/{userId}/expenses/{expenseId}": {
+        "schema": { "$ref": "#/entities/Expense" },
+        "description": "Stores expense records for a specific user."
+    },
+    "/users/{userId}/categories/{categoryId}": {
+        "schema": { "$ref": "#/entities/Category" },
+        "description": "Stores user-defined expense categories."
+    },
+    "/users/{userId}/budgets/{budgetId}": {
+        "schema": { "$ref": "#/entities/Budget" },
+        "description": "Stores budget goals for a specific user."
+    },
+    "/users/{userId}/savingsGoals/{goalId}": {
+        "schema": { "$ref": "#/entities/SavingsGoal" },
+        "description": "Stores savings goals for a specific user."
+    },
+    "/users/{userId}/contributions/{contributionId}": {
+        "schema": { "$ref": "#/entities/Contribution" },
+        "description": "Stores contribution records for a specific user's savings goals."
+    },
+    "/users/{userId}/rollovers/{rolloverId}": {
+        "schema": { "$ref": "#/entities/Rollover" },
+        "description": "Stores budget rollover transactions for a user."
+    }
+  }
+}
